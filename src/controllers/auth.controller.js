@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
 
-async function registeUser(req,res) {
+async function registerUser(req,res) {
     const {username, fullname :{firstname,lastname}, email, password}= req.body
     const isUserAlreadyExist = await userModel.findOne({
         $or : [{username},{email}]
@@ -17,7 +17,8 @@ async function registeUser(req,res) {
 
     const hashedpassword = await bcrypt.hash(password,10)
     const user = await userModel.create({
-        username, fullname:{
+        username, 
+        fullname:{
             firstname,
             lastname
         },
@@ -73,4 +74,77 @@ async function loginUser(req, res) {
     })
 }
 
-module.exports ={registeUser, loginUser}
+async function registerSeller(req, res) {
+    const {username, fullname:{firstname,lastname}, email, password} = req.body
+    
+    const isSellerAlreadyExist = await userModel.findOne({
+        $or : [{username},{email}]
+    })
+
+    if(isSellerAlreadyExist){
+        return res.status(422).json({
+            message : isSellerAlreadyExist.username == username ? "username already exists" : " email already exists"
+        })
+    }
+ 
+    const hashedpassword = await bcrypt.hash(password,10)
+
+    const seller = await userModel.create({
+        username,
+        fullname :{firstname,lastname},
+        email,
+        password: hashedpassword,
+        role :"seller"
+    })
+
+    const token = jwt.sign({id: seller._id},process.env.JWT_SECRET)
+    res.cookie("token", token)
+
+    res.status(201).json({
+        message : "seller registered successfully",
+        seller :{
+            id: seller._id,
+            username : seller.username,
+            fullname: seller.fullname,
+            email : seller.email
+        }
+    })
+}
+
+
+async function loginSeller(req, res) {
+    const { username, email, password} = req.body;
+
+    const seller = await userModel.findOne({
+        $or: [{username},{email}]
+    })
+
+    if(!seller){
+        return res.status(400).json({
+            message : "Invalid credentials"
+        })
+    }
+    
+    const isPasswordValid = await bcrypt.compare(password, seller.password)
+
+    if(!isPasswordValid){
+        return res.status(409).json({
+            message : " Invalid credentials"
+        })
+    }
+
+    const token = jwt.sign({id:seller._id}, process.env.JWT_SECRET)
+    res.cookie("token", token);
+
+    res.status(200).json({
+        message : "seller logged in successfully",
+        seller :{
+            id: seller._id,
+            username : seller.username,
+            fullname: seller.fullname,
+            email : seller.email
+        }
+    })
+}
+
+module.exports ={registerUser, loginUser , registerSeller,loginSeller}
