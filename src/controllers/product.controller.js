@@ -28,4 +28,42 @@ async function createProduct(req, res) {
         product
      })
 }
-module.exports = {createProduct}
+
+
+async function getSellerProduct(req, res) {
+    const seller = req.seller;
+
+    const product = await productModel.find({
+        seller : seller._id
+    })
+
+    res.status(200).json({
+        message : "seller product fetched successfully",
+        product
+    })
+    
+}
+
+async function getAllProducts(req, res) {
+    const products = await productModel.find().populate("seller")
+
+    res.status(200).json({
+        message: "All products fetched successfully",
+        products
+    })
+}
+
+
+async function getProductDetails(req, res) {
+    const productId = req.params.id
+
+    const product = await productModel.findOne({
+        _id: productId
+    })
+    res.status(200).json({
+        message : "product details fetch successfully",
+        product
+    })
+    
+}
+module.exports = {createProduct, getSellerProduct, getAllProducts,getProductDetails}

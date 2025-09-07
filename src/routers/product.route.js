@@ -15,6 +15,15 @@ router.post("/",authMiddleware.authSeller,
     productController.createProduct
 )
 
+// get /seller
 
+router.get("/seller",
+    authMiddleware.authSeller,
+    productController.getSellerProduct
+)
+
+router.get("/", productController.getAllProducts)
+
+router.get("/product-details/:id",productController.getProductDetails)
 
 module.exports = router

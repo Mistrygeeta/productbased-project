@@ -1,5 +1,5 @@
 const ImageKit = require("imagekit");
-const {v4:uuidv4} = require("uuid")
+
 
 
 const imagekit = new ImageKit({
@@ -9,6 +9,8 @@ const imagekit = new ImageKit({
 })
 
 async function uploadFile(fileBuffer) {
+const {v4:uuidv4} = await import("uuid")
+
     const result = imagekit.upload({
         file : fileBuffer,
         fileName: uuidv4(),
