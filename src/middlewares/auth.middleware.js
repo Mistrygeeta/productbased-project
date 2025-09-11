@@ -33,4 +33,29 @@ async function authSeller(req, res , next) {
     
 }
 
-module.exports = {authSeller}
+async function authUser(req, res, next) {
+    const token = req.cookies.token;
+
+    try {
+        if(!token){
+            return res.status(401).json({
+                message: "token not found ! unauthorized user"
+            })
+        }
+    const decoded= jwt.verify(token,process.env.JWT_SECRET)
+
+    const user = await userModel.findById(decoded.id)
+    if(!user){
+        return res.status(404).json({
+            message : "user not found"
+        })
+    }
+
+    req.user = user;
+    next()
+    } catch (error) {
+        console.log("error in auth middleware", error.message)
+    }
+}
+
+module.exports = {authSeller, authUser}
