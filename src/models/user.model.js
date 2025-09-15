@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
     password:{
         type: String
     },
+    cart:{
+        type:[],
+        ref: "product"
+    },
     role: {
         type: String,
         enum :["user", "seller"],

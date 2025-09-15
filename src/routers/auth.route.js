@@ -15,8 +15,9 @@ router.get("/me",authUser, (req, res)=>{
 router.post("/user/register", authController.registerUser)
 router.post("/user/login", authController.loginUser)
 
-router.post("/seller/register", authController.registerSeller)
-router.post("/seller/login", authController.loginSeller)
+router.get("/user/logout", authController.logoutUser)
+router.post("/seller/register",authUser, authController.registerSeller)
+// router.post("/seller/login", authController.loginSeller)
 
 
 module.exports = router;

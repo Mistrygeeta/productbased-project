@@ -3,13 +3,14 @@ const storageService = require("../services/storage.service")
 
 
 async function createProduct(req, res) {
-    const {title, description , price, stock} = req.body;
+    const {title, description , price, stock,images} = req.body;
+    console.log("this way-->",title, req.files)
     const files = await Promise.all(req.files.map(async function (file) {
         return await storageService.uploadFile(file.buffer)
     }))
      const seller = req.seller
 
-     const realPrice = JSON.parse(price)
+     const realPrice = price
 
      const product = await productModel.create({
         title,
